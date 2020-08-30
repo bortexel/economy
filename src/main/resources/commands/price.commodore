@@ -1,0 +1,5 @@
+price {
+    item brigadier:string single_word {
+        amount brigadier:integer;
+    }
+}

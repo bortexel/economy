@@ -8,3 +8,6 @@ commands:
         description: Основная команда
         aliases: [eco]
         permission: bortexel.eco
+    price:
+        description: Получить актуальную стоимость предмета по его идентификатору
+        aliases: [getprice,стоимость]
