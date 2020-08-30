@@ -1,0 +1,10 @@
+name: BortexelEconomy
+main: ru.ruscalworld.bortexel.economy.BortexelEconomy
+version: ${version}
+author: RuscalWorld
+api-version: '1.16'
+commands:
+    economy:
+        description: Основная команда
+        aliases: [eco]
+        permission: bortexel.eco

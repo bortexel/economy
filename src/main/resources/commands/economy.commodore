@@ -1,0 +1,11 @@
+economy {
+    report {
+        item brigadier:string single_word {
+            price brigadier:float;
+        }
+    }
+    reload {
+        config;
+        cache;
+    }
+}
