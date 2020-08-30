@@ -38,7 +38,7 @@ public class EconomyCommand implements CommandExecutor {
         switch (args[0]) {
             case "report":
                 if (args.length < 3) {
-                    commandSender.sendMessage("§fИспользование: §9/eco report <предмет> <стоимость>");
+                    commandSender.sendMessage("§fИспользование: §9/eco report <предмет> <стоимость> [количество]");
                     return true;
                 }
 
@@ -47,8 +47,12 @@ public class EconomyCommand implements CommandExecutor {
                 if (!(commandSender instanceof Player)) return false;
                 Player player = (Player) commandSender;
 
-                String item = args[1];
+                int amount = 1;
+                if (args.length == 4) amount = Integer.parseInt(args[3]);
+
+                String item = args[1].toLowerCase();
                 float price = Float.parseFloat(args[2]);
+                price = Math.round(price / amount * 1000) / (float) 1000;
                 Location location = player.getLocation();
                 if (location.getWorld() == null) return false;
 
@@ -64,7 +68,7 @@ public class EconomyCommand implements CommandExecutor {
                 report.setWorld(location.getWorld().getName());
 
                 new ReportPusher(client, report).start();
-                player.sendMessage("Данные отправлены.");
+                player.sendMessage("§fПредмет: §9" + item + "§f, стоимость за 1 ед.: §9" + price);
                 break;
             case "reload":
                 if (commandSender.hasPermission("bortexel.eco.reload")) {
