@@ -38,7 +38,7 @@ public class PriceCommand implements CommandExecutor {
 
             ItemPrices.Item item = prices.item;
             LinkedHashMap<String, Object> priceObj = prices.prices.get(prices.prices.size() - 1);
-            float price = Float.parseFloat((String) priceObj.get("price"));
+            double price = (double) priceObj.get("price");
 
             String message = "§fАктуальная стоимость на §9" + item.name + "§f (§9" + item.id + "§f):\n" +
                     "§fЗа 1 ед.: §9" + formatPrice(price) + "§f";
@@ -59,13 +59,13 @@ public class PriceCommand implements CommandExecutor {
         return true;
     }
 
-    private String formatPrice(float price) {
+    private String formatPrice(double price) {
         if (price > 10) price = Math.round(price);
 
         if (price > 64) {
             int count = (int) Math.floor(price / 64);
             int integer = count * 64;
-            float other = price - integer;
+            double other = price - integer;
             return other == 0 ? count + " ст." : count + " ст. + " + Math.round(other);
         }
 
