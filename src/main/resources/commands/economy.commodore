@@ -6,6 +6,11 @@ economy {
             }
         }
     }
+    shop {
+        set {
+            id brigadier:integer;
+        }
+    }
     reload {
         config;
         cache;

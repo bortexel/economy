@@ -19,6 +19,7 @@ import ru.ruscalworld.bortexel4j.economy.Item;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ public class BortexelEconomy extends JavaPlugin {
     Bortexel4J client;
     List<Item> items;
     List<String> itemSuggestions = new ArrayList<>();
+    public HashMap<String, Integer> shops = new HashMap<>();
 
     @Override
     public void onEnable() {

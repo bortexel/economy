@@ -47,6 +47,11 @@ public class EconomyCommand implements CommandExecutor {
                 if (!(commandSender instanceof Player)) return false;
                 Player player = (Player) commandSender;
 
+                if (!plugin.shops.containsKey(player.getName())) {
+                    player.sendMessage("§c§l[!] §fУкажите название магазина: §9/eco shop set <id>");
+                    return false;
+                }
+
                 int amount = 1;
                 if (args.length == 4) amount = Integer.parseInt(args[3]);
 
@@ -66,13 +71,27 @@ public class EconomyCommand implements CommandExecutor {
                 report.setY((int) location.getY());
                 report.setZ((int) location.getZ());
                 report.setWorld(location.getWorld().getName());
+                report.setShop(plugin.shops.get(player.getName()));
 
                 new ReportPusher(client, report).start();
                 player.sendMessage("§fПредмет: §9" + item + "§f, стоимость за 1 ед.: §9" + price);
                 break;
+            case "shop":
+                if (commandSender.hasPermission("bortexel.eco.shop")) {
+                    if (args[1].equalsIgnoreCase("set")) {
+                        if (!(commandSender instanceof Player)) return false;
+                        player = (Player) commandSender;
+                        try {
+                            int id = Integer.parseInt(args[2]);
+                            plugin.shops.put(player.getName(), id);
+                            player.sendMessage("§fУспешно выбран магазин с ID §9" + id);
+                        } catch (Exception ignored) { }
+                    }
+                }
+                break;
             case "reload":
                 if (commandSender.hasPermission("bortexel.eco.reload")) {
-                    switch (args[1]) {
+                    switch (args[1].toLowerCase()) {
                         case "config":
                             commandSender.sendMessage("§aConfiguration reloaded");
                             plugin.reloadConfig();
