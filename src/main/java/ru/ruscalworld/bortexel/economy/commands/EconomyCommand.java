@@ -74,7 +74,7 @@ public class EconomyCommand implements CommandExecutor {
                     Action<Report> action = report.create(plugin.getClient());
                     action.setExecutorID(id);
                     action.executeAsync(response -> {
-                        player.sendMessage("§fПредмет: §7" + response.getItemID() + "§f, стоимость за 1 ед.: §9" + response.getPrice());
+                        player.sendMessage("§fПредмет: §7" + response.getItemID() + "§f, стоимость за 1 шт.: §9" + response.getPrice());
                     }, error -> player.sendMessage("§c§l[!] §fНе удалось записать стоимость: " + error.getMessage()));
                 });
                 break;

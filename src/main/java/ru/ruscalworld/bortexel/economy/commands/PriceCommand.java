@@ -34,7 +34,7 @@ public class PriceCommand implements CommandExecutor {
                     "§fЗа 1 шт.: §9" + formatPrice(price.getPrice()) + "§f";
 
             if (amount == 1) {
-                message = message + "; за 32 ед.: §9" + (formatPrice(price.getPrice() * 32)) +
+                message = message + "; за 32 шт.: §9" + (formatPrice(price.getPrice() * 32)) +
                         "§f; за 64 шт.: §9" + (formatPrice(price.getPrice() * 64));
             } else message = message + "; шт " + amount + " шт.: §9" + formatPrice(price.getPrice() * amount);
 
