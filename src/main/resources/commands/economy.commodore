@@ -1,15 +1,15 @@
 economy {
-    report {
+    create {
         item brigadier:string single_word {
-            price brigadier:float {
-                amount brigadier:integer;
+            quantity brigadier:integer {
+                price brigadier:float {
+                    amount brigadier:integer;
+                }
             }
         }
     }
-    shop {
-        set {
-            id brigadier:integer;
-        }
+    select {
+        id brigadier:integer;
     }
     reload {
         config;

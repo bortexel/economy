@@ -4,13 +4,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import ru.ruscalworld.bortexel.economy.BortexelEconomy;
-import ru.ruscalworld.bortexel4j.Bortexel4J;
-import ru.ruscalworld.bortexel4j.economy.ItemPrices;
+import ru.ruscalworld.bortexel4j.models.economy.Item;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.LinkedHashMap;
+import java.util.List;
 
 public class PriceCommand implements CommandExecutor {
 
@@ -23,43 +21,33 @@ public class PriceCommand implements CommandExecutor {
             return true;
         }
 
-        new Thread(() -> {
+        Item.getByID(args[0]).executeAsync(item -> item.getPrices().executeAsync(prices -> {
+            List<Item.ItemPrice> priceList = prices.getPrices();
+            if (priceList.size() == 0) commandSender.sendMessage("§c§l[!] §fСтоимость на данный предмет не установлена.");
+            Item.ItemPrice price = priceList.get(priceList.size() - 1);
+
             int amount = 1;
             if (args.length == 2) amount = Integer.parseInt(args[1]);
 
-            ItemPrices prices;
-
-            try {
-                prices = ItemPrices.getPrices(args[0]);
-            } catch (Exception e) {
-                commandSender.sendMessage("§c§l[!] §fПредмет не найден");
-                return;
-            }
-
-            ItemPrices.Item item = prices.item;
-            LinkedHashMap<String, Object> priceObj = prices.prices.get(prices.prices.size() - 1);
-            double price = (double) priceObj.get("price");
-
-            String message = "§fАктуальная стоимость на §9" + item.name + "§f (§9" + item.id + "§f):\n" +
-                    "§fЗа 1 ед.: §9" + formatPrice(price) + "§f";
+            String message = "§fАктуальная стоимость на §9" + item.getName() + "§f (§9" + item.getId() + "§f):\n" +
+                    "§fЗа 1 ед.: §9" + formatPrice(price.getPrice()) + "§f";
 
             if (amount == 1) {
-                message = message + "; за 32 ед.: §9" + (formatPrice(price * 32)) +
-                        "§f; за 64 ед.: §9" + (formatPrice(price * 64));
-            } else {
-                message = message + "; за " + amount + " ед.: §9" + formatPrice(price * amount);
-            }
+                message = message + "; за 32 ед.: §9" + (formatPrice(price.getPrice() * 32)) +
+                        "§f; за 64 ед.: §9" + (formatPrice(price.getPrice() * 64));
+            } else message = message + "; за " + amount + " ед.: §9" + formatPrice(price.getPrice() * amount);
 
             Format formatter = new SimpleDateFormat("dd.MM.yyyy");
-            message = message + "\n§fПоследнее обновление: §9" +
-                    formatter.format(new Long("" + priceObj.get("time")) * 1000);
+            message = message + "\n§fПоследнее обновление: §9" + formatter.format(price.getTime().getTime());
+
             commandSender.sendMessage(message);
-        }).start();
+        }), error -> commandSender.sendMessage("§c§l[!] §fПредмет не найден."));
 
         return true;
     }
 
     private String formatPrice(double price) {
+        price = Math.round(price * 100D) / 100D;
         if (price > 10) price = Math.round(price);
 
         if (price > 64) {

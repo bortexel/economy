@@ -6,7 +6,7 @@
 
     <groupId>ru.ruscalworld.bortexel.economy</groupId>
     <artifactId>BortexelEconomy</artifactId>
-    <version>1.0.1</version>
+    <version>2.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,7 +48,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>ru.ruscalworld.bortexel.bortexel4j</include>
+                                    <include>ru.bortexel:Bortexel4J</include>
                                     <include>me.lucko:commodore</include>
                                     <include>com.fasterxml.jackson.core:jackson-core</include>
                                     <include>com.fasterxml.jackson.core:jackson-databind</include>
@@ -64,6 +64,10 @@
                                 </filter>
                             </filters>
                             <relocations>
+                                <relocation>
+                                    <pattern>ru.bortexel.Bortexel4J</pattern>
+                                    <shadedPattern>ru.ruscalworld.bortexel.economy.dependencies.bortexel4j</shadedPattern>
+                                </relocation>
                                 <relocation>
                                     <pattern>me.lucko.commodore</pattern>
                                     <shadedPattern>ru.ruscalworld.bortexel.economy.dependencies.commodore</shadedPattern>
@@ -110,9 +114,9 @@
             <version>1.16.4-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>ru.ruscalworld.bortexel.bortexel4j</groupId>
+            <groupId>ru.bortexel</groupId>
             <artifactId>Bortexel4J</artifactId>
-            <version>0.12</version>
+            <version>1.1.2</version>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>

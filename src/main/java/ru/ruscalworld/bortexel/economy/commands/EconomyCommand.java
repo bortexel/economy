@@ -7,10 +7,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import ru.ruscalworld.bortexel.economy.BortexelEconomy;
-import ru.ruscalworld.bortexel.economy.ItemCacher;
-import ru.ruscalworld.bortexel.economy.ReportPusher;
-import ru.ruscalworld.bortexel4j.Bortexel4J;
-import ru.ruscalworld.bortexel4j.economy.Report;
+import ru.ruscalworld.bortexel4j.core.Action;
+import ru.ruscalworld.bortexel4j.models.economy.Report;
+import ru.ruscalworld.bortexel4j.models.shop.Shop;
 
 public class EconomyCommand implements CommandExecutor {
 
@@ -23,74 +22,87 @@ public class EconomyCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String alias, String @NotNull [] args) {
 
-        if (!command.getName().equals("economy")) return false;
+        if (!command.getName().equals("ecoreport")) return false;
         if (args.length == 0) {
             commandSender.sendMessage("§8§l=====================\n" +
                     " §9BortexelEconomy §fis a plugin that adds ability to work with Economy API in game.\n" +
                     " §fWritten by §9RuscalWorld §ffor §6Bortexel §fMinecraft server.\n" +
                     " §fIP: §9vanilla.bortexel.ru\n" +
                     " §fPlugin version: §9" + plugin.getDescription().getVersion() + "\n" +
-                    " §f© RuscalWorld, 2020\n" +
+                    " §f© RuscalWorld, 2020-2021\n" +
                     "§8§l=====================");
             return true;
         }
 
         switch (args[0]) {
-            case "report":
-                if (args.length < 3) {
-                    commandSender.sendMessage("§fИспользование: §9/eco report <предмет> <стоимость> [количество]");
+            case "create":
+                if (args.length < 4) {
+                    commandSender.sendMessage("§fИспользование: §9/ecoreport create <предмет> <в наличии> <стоимость> [количество]");
                     return true;
                 }
 
-                if (!commandSender.hasPermission("bortexel.eco.report")) return false;
+                if (!commandSender.hasPermission("economy.report")) return false;
 
                 if (!(commandSender instanceof Player)) return false;
                 Player player = (Player) commandSender;
 
                 if (!plugin.shops.containsKey(player.getName())) {
-                    player.sendMessage("§c§l[!] §fУкажите название магазина: §9/eco shop set <id>");
+                    player.sendMessage("§c§l[!] §fУкажите название магазина: §9/ecoreport select <id>");
                     return false;
                 }
 
                 int amount = 1;
-                if (args.length == 4) amount = Integer.parseInt(args[3]);
+                if (args.length == 5) amount = Integer.parseInt(args[4]);
 
                 String item = args[1].toLowerCase();
-                float price = Float.parseFloat(args[2]);
+                int quantity = Integer.parseInt(args[2]);
+                float price = Float.parseFloat(args[3]);
                 price = Math.round(price / amount * 1000) / (float) 1000;
                 Location location = player.getLocation();
                 if (location.getWorld() == null) return false;
 
-                Bortexel4J client = plugin.getClient();
-                Report report = Report.create();
+                Report.Builder builder = new Report.Builder();
+                builder.setPrice(price);
+                builder.setItemID(item);
+                builder.setQuantity(quantity);
+                builder.setLocation(new ru.ruscalworld.bortexel4j.util.Location(location.getBlockX(),
+                        location.getBlockY(), location.getBlockZ(), location.getWorld().getName()));
+                builder.setShopID(plugin.shops.get(player.getName()));
 
-                report.setPrice(price);
-                report.setItem(item);
-                report.setAuthor(commandSender.getName());
-                report.setX((int) location.getX());
-                report.setY((int) location.getY());
-                report.setZ((int) location.getZ());
-                report.setWorld(location.getWorld().getName());
-                report.setShop(plugin.shops.get(player.getName()));
-
-                new ReportPusher(client, report).start();
-                player.sendMessage("§fПредмет: §9" + item + "§f, стоимость за 1 ед.: §9" + price);
+                plugin.getPlayerID(player, id -> {
+                    Report report = builder.build();
+                    Action<Report> action = report.create(plugin.getClient());
+                    action.setExecutorID(id);
+                    action.executeAsync(response -> {
+                        player.sendMessage("§fПредмет: §7" + response.getItemID() + "§f, стоимость за 1 ед.: §9" + response.getPrice());
+                    }, error -> player.sendMessage("§c§l[!] §fНе удалось записать стоимость: " + error.getMessage()));
+                });
                 break;
-            case "shop":
-                if (commandSender.hasPermission("bortexel.eco.shop")) {
-                    if (args[1].equalsIgnoreCase("set")) {
-                        if (!(commandSender instanceof Player)) return false;
-                        player = (Player) commandSender;
-                        try {
-                            int id = Integer.parseInt(args[2]);
-                            plugin.shops.put(player.getName(), id);
-                            player.sendMessage("§fУспешно выбран магазин с ID §9" + id);
-                        } catch (Exception ignored) { }
+            case "select":
+                if (commandSender.hasPermission("economy.select")) {
+                    if (args.length < 2) {
+                        commandSender.sendMessage("§fИспользование: §9/ecoreport select <id>");
+                        return true;
                     }
+
+                    if (!(commandSender instanceof Player)) return false;
+                    player = (Player) commandSender;
+                    try {
+                        int id = Integer.parseInt(args[1]);
+                        Shop.getByID(id).executeAsync(shop -> plugin.getPlayerID(player, playerID -> {
+                            if (shop.getOwnerID() != playerID && !player.hasPermission("economy.inspector")) {
+                                player.sendMessage("§c§l[!] §fЭтот магазин Вам не принадлежит.");
+                                return;
+                            }
+
+                            plugin.shops.put(player.getName(), id);
+                            player.sendMessage("§fУспешно выбран магазин §7" + shop.getName());
+                        }), error -> player.sendMessage("§c§l[!] §fМагазин не найден."));
+                    } catch (Exception ignored) { }
                 }
                 break;
             case "reload":
-                if (commandSender.hasPermission("bortexel.eco.reload")) {
+                if (commandSender.hasPermission("economy.reload")) {
                     switch (args[1].toLowerCase()) {
                         case "config":
                             commandSender.sendMessage("§aConfiguration reloaded");
@@ -98,13 +110,15 @@ public class EconomyCommand implements CommandExecutor {
                             break;
                         case "cache":
                             commandSender.sendMessage("Reloading cache...");
-                            new ItemCacher(plugin).start();
+                            plugin.updateItemCache();
                             break;
                         default:
                             commandSender.sendMessage("§c§l[!] §fUnknown action: §7" + args[1]);
                     }
                 }
                 break;
+            default:
+                commandSender.sendMessage("§c§l[!] §fНеизвестный аргумент.");
         }
 
         return true;

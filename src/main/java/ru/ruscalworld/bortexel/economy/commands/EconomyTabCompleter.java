@@ -20,16 +20,18 @@ public class EconomyTabCompleter implements TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (!command.getName().equals("economy")) return null;
+        if (!command.getName().equals("ecoreport")) return null;
         List<String> suggestions = new ArrayList<>();
 
         switch (args.length) {
             case 0:
             case 1:
             case 3:
+            case 4:
                 return suggestions;
             case 2:
-                return plugin.getItemSuggestions();
+                if (args[0].equals("create")) return plugin.getItemSuggestions();
+                else return suggestions;
         }
 
         return suggestions;

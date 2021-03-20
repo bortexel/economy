@@ -4,10 +4,10 @@ version: ${version}
 author: RuscalWorld
 api-version: '1.16'
 commands:
-    economy:
+    ecoreport:
         description: Основная команда
-        aliases: [eco]
-        permission: bortexel.eco
+        aliases: [er]
+        permission: economy.report
     price:
         description: Получить актуальную стоимость предмета по его идентификатору
         aliases: [getprice,стоимость]
