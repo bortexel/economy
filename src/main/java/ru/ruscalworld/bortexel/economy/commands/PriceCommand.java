@@ -29,16 +29,16 @@ public class PriceCommand implements CommandExecutor {
             int amount = 1;
             if (args.length == 2) amount = Integer.parseInt(args[1]);
 
-            String message = "§fАктуальная стоимость на §9" + item.getName() + "§f (§9" + item.getId() + "§f):\n" +
-                    "§fЗа 1 ед.: §9" + formatPrice(price.getPrice()) + "§f";
+            String message = "§fАктуальная стоимость на §7" + item.getName() + "§f (§7" + item.getId() + "§f):\n" +
+                    "§fЗа 1 шт.: §9" + formatPrice(price.getPrice()) + "§f";
 
             if (amount == 1) {
                 message = message + "; за 32 ед.: §9" + (formatPrice(price.getPrice() * 32)) +
-                        "§f; за 64 ед.: §9" + (formatPrice(price.getPrice() * 64));
-            } else message = message + "; за " + amount + " ед.: §9" + formatPrice(price.getPrice() * amount);
+                        "§f; за 64 шт.: §9" + (formatPrice(price.getPrice() * 64));
+            } else message = message + "; шт " + amount + " шт.: §9" + formatPrice(price.getPrice() * amount);
 
             Format formatter = new SimpleDateFormat("dd.MM.yyyy");
-            message = message + "\n§fПоследнее обновление: §9" + formatter.format(price.getTime().getTime());
+            message = message + "\n§fПоследнее обновление: §7" + formatter.format(price.getTime().getTime());
 
             commandSender.sendMessage(message);
         }), error -> commandSender.sendMessage("§c§l[!] §fПредмет не найден."));
@@ -48,13 +48,16 @@ public class PriceCommand implements CommandExecutor {
 
     private String formatPrice(double price) {
         price = Math.round(price * 100D) / 100D;
-        if (price > 10) price = Math.round(price);
 
         if (price > 64) {
-            int count = (int) Math.floor(price / 64);
-            int integer = count * 64;
-            double other = price - integer;
-            return other == 0 ? count + " ст." : count + " ст. + " + Math.round(other);
+            int stacks = (int) price / 64;
+            int remaining = (int) price % 64;
+
+            String res = "";
+            if (stacks != 0) res = stacks + " ст.";
+            if (remaining != 0) res = res + (stacks != 0 ? " + " : "") + remaining;
+
+            return res;
         }
 
         return "" + price;
