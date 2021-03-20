@@ -9,6 +9,7 @@ import ru.ruscalworld.bortexel4j.models.economy.Item;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class PriceCommand implements CommandExecutor {
 
@@ -37,7 +38,7 @@ public class PriceCommand implements CommandExecutor {
                         "§f; за 64 шт.: §9" + (formatPrice(price.getPrice() * 64));
             } else message = message + "; шт " + amount + " шт.: §9" + formatPrice(price.getPrice() * amount);
 
-            Format formatter = new SimpleDateFormat("dd.MM.yyyy");
+            Format formatter = new SimpleDateFormat("dd MMM yyyy", new Locale("ru"));
             message = message + "\n§fПоследнее обновление: §7" + formatter.format(price.getTime().getTime());
 
             commandSender.sendMessage(message);
