@@ -95,6 +95,16 @@ public class EconomyCommand implements CommandExecutor {
                                 return;
                             }
 
+                            if (!shop.isActive()) {
+                                player.sendMessage("§c§l[!] §fЭтот магазин неактивен, записать цены в нём невозможно.");
+                                return;
+                            }
+
+                            if (!shop.isVerified() && !player.hasPermission("economy.inspector")) {
+                                player.sendMessage("§c§l[!] §fЭтот магазин не подтверждён, и записать цены в нём может только ревизор.");
+                                return;
+                            }
+
                             plugin.shops.put(player.getName(), id);
                             player.sendMessage("§fУспешно выбран магазин §7" + shop.getName());
                         }), error -> player.sendMessage("§c§l[!] §fМагазин не найден."));
