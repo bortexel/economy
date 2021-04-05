@@ -11,3 +11,6 @@ commands:
     price:
         description: Получить актуальную стоимость предмета по его идентификатору
         aliases: [getprice,стоимость]
+    ruslan:
+        description: Задать вопрос Руслану
+        aliases: [ai,руслан]

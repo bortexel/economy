@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.ruscalworld.bortexel.economy.commands.EconomyCommand;
 import ru.ruscalworld.bortexel.economy.commands.EconomyTabCompleter;
 import ru.ruscalworld.bortexel.economy.commands.PriceCommand;
+import ru.ruscalworld.bortexel.economy.commands.RuslanCommand;
 import ru.ruscalworld.bortexel4j.Bortexel4J;
 import ru.ruscalworld.bortexel4j.core.Callback;
 import ru.ruscalworld.bortexel4j.models.economy.Item;
@@ -39,6 +40,10 @@ public class BortexelEconomy extends JavaPlugin {
             if (args.length == 1) return this.getItemSuggestions();
             return new ArrayList<>();
         });
+
+        PluginCommand ruslan = Objects.requireNonNull(getCommand("ruslan"));
+        ruslan.setExecutor(new RuslanCommand());
+        ruslan.setTabCompleter((sender, command, alias, args) -> new ArrayList<>());
 
         if (CommodoreProvider.isSupported()) {
             Commodore commodore = CommodoreProvider.getCommodore(this);
