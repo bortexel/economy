@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.network.ServerPlayerEntity;
 import ru.bortexel.economy.commands.PriceCommand;
 import ru.bortexel.economy.commands.ReportCommand;
+import ru.bortexel.economy.commands.RuslanCommand;
 import ru.bortexel.economy.config.EconomyConfig;
 import ru.ruscalworld.bortexel4j.Bortexel4J;
 import ru.ruscalworld.bortexel4j.core.Callback;
@@ -33,6 +34,7 @@ public class Economy implements ModInitializer {
             if (!dedicated) return;
             PriceCommand.register(dispatcher, this);
             ReportCommand.register(dispatcher, this);
+            RuslanCommand.register(dispatcher, this);
         }));
     }
 
