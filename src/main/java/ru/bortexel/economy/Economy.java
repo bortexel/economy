@@ -8,6 +8,7 @@ import ru.bortexel.economy.commands.ReportCommand;
 import ru.bortexel.economy.config.EconomyConfig;
 import ru.ruscalworld.bortexel4j.Bortexel4J;
 import ru.ruscalworld.bortexel4j.core.Callback;
+import ru.ruscalworld.bortexel4j.models.economy.Item;
 import ru.ruscalworld.bortexel4j.models.user.User;
 
 import java.io.IOException;
@@ -20,11 +21,13 @@ public class Economy implements ModInitializer {
 
     private final HashMap<UUID, Integer> shopSelectionMap = new HashMap<>();
     private final HashMap<UUID, Integer> playerCache = new HashMap<>();
+    private final HashMap<String, Item> itemCache = new HashMap<>();
 
     @Override
     public void onInitialize() {
         this.loadConfig();
         this.setClient(Bortexel4J.login(this.getConfig().getApiToken(), this.getConfig().getApiUrl()));
+        this.updateItemCache();
 
         CommandRegistrationCallback.EVENT.register(((dispatcher, dedicated) -> {
             if (!dedicated) return;
@@ -39,6 +42,15 @@ public class Economy implements ModInitializer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateItemCache() {
+        this.getItemCache().clear();
+        Item.getAll(this.getClient()).executeAsync(categories -> {
+            for (Item.Category category : categories) for (Item item : category.getItems()) {
+                this.getItemCache().put(item.getId(), item);
+            }
+        });
     }
 
     public void getPlayerID(ServerPlayerEntity player, Callback<Integer> callback) {
@@ -63,5 +75,9 @@ public class Economy implements ModInitializer {
 
     public HashMap<UUID, Integer> getShopSelectionMap() {
         return shopSelectionMap;
+    }
+
+    public HashMap<String, Item> getItemCache() {
+        return itemCache;
     }
 }

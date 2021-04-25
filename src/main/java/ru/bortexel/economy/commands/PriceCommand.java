@@ -13,6 +13,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import ru.bortexel.economy.Economy;
+import ru.bortexel.economy.suggestions.ItemSuggestionProvider;
 import ru.bortexel.economy.util.TextUtil;
 import ru.ruscalworld.bortexel4j.Bortexel4J;
 import ru.ruscalworld.bortexel4j.models.economy.Item;
@@ -21,6 +22,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.server.command.CommandManager.*;
 
@@ -32,7 +34,11 @@ public class PriceCommand extends BortexelCommand {
     @Override
     public int run(CommandContext<ServerCommandSource> context) {
         Bortexel4J client = this.getMod().getClient();
-        Item.getByID(StringArgumentType.getString(context, "item"), client).executeAsync(item -> item.getPrices(client).executeAsync(prices -> {
+        String itemID = StringArgumentType.getString(context, "item");
+        if (!this.getMod().getItemCache().containsKey(itemID))
+            throw new CommandException(new LiteralText("Предмет \"" + itemID + "\" не найден"));
+
+        Item.getByID(itemID, client).executeAsync(item -> item.getPrices(client).executeAsync(prices -> {
             List<Item.ItemPrice> priceList = prices.getPrices();
             if (priceList.size() == 0) throw new CommandException(new LiteralText("Стоимость на данный предмет не установлена"));
             Item.ItemPrice price = priceList.get(priceList.size() - 1);
@@ -43,7 +49,7 @@ public class PriceCommand extends BortexelCommand {
             } catch (Exception ignored) { }
 
             MutableText text = new LiteralText("");
-            text.append(new LiteralText("Цена на " + item.getName().toLowerCase() + "\n").formatted(Formatting.BOLD));
+            text.append(new LiteralText(item.getName() + "\n").formatted(Formatting.BOLD));
             text.append(new LiteralText("За 1 шт.: ").formatted(Formatting.RESET))
                     .append(new LiteralText(TextUtil.formatPrice(price.getPrice())).formatted(Formatting.BLUE));
             text.append("; ");
@@ -63,19 +69,16 @@ public class PriceCommand extends BortexelCommand {
                     .append(new LiteralText(formatter.format(price.getTime().getTime())).formatted(Formatting.GRAY));
 
             context.getSource().sendFeedback(text, false);
-        }, error -> {
-            throw new CommandException(new LiteralText("Предмет с заданным идентификатором не существует"));
-        }));
+        }, error -> TextUtil.sendCommandError(context.getSource(), "Предмет с заданным идентификатором не существует")));
         return Command.SINGLE_SUCCESS;
     }
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, Economy mod) {
         LiteralCommandNode<ServerCommandSource> command = dispatcher.register(
-                CommandManager.literal("price")
-                        .then(CommandManager.argument("item", StringArgumentType.word())
-                                .then(CommandManager.argument("amount", IntegerArgumentType.integer(0)))
-                                    .executes(new PriceCommand(mod))
-                                .executes(new PriceCommand(mod))));
+                CommandManager.literal("price").then(
+                        CommandManager.argument("item", StringArgumentType.string()).suggests(new ItemSuggestionProvider(mod)).then(
+                                CommandManager.argument("amount", IntegerArgumentType.integer(0)).executes(new PriceCommand(mod))
+                        ).executes(new PriceCommand(mod))));
         dispatcher.register(literal("стоимость").redirect(command));
     }
 }
