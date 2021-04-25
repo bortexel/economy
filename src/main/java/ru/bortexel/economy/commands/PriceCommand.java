@@ -12,6 +12,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
+import ru.bortexel.economy.Economy;
 import ru.bortexel.economy.util.TextUtil;
 import ru.ruscalworld.bortexel4j.Bortexel4J;
 import ru.ruscalworld.bortexel4j.models.economy.Item;
@@ -24,13 +25,14 @@ import java.util.Locale;
 import static net.minecraft.server.command.CommandManager.*;
 
 public class PriceCommand extends BortexelCommand {
-    public PriceCommand(Bortexel4J client) {
-        super(client);
+    public PriceCommand(Economy mod) {
+        super(mod);
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) {
-        Item.getByID(StringArgumentType.getString(context, "item"), this.getClient()).executeAsync(item -> item.getPrices(this.getClient()).executeAsync(prices -> {
+        Bortexel4J client = this.getMod().getClient();
+        Item.getByID(StringArgumentType.getString(context, "item"), client).executeAsync(item -> item.getPrices(client).executeAsync(prices -> {
             List<Item.ItemPrice> priceList = prices.getPrices();
             if (priceList.size() == 0) throw new CommandException(new LiteralText("Стоимость на данный предмет не установлена"));
             Item.ItemPrice price = priceList.get(priceList.size() - 1);
@@ -67,13 +69,13 @@ public class PriceCommand extends BortexelCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, Bortexel4J client) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, Economy mod) {
         LiteralCommandNode<ServerCommandSource> command = dispatcher.register(
                 CommandManager.literal("price")
                         .then(CommandManager.argument("item", StringArgumentType.word())
                                 .then(CommandManager.argument("amount", IntegerArgumentType.integer(0)))
-                                    .executes(new PriceCommand(client))
-                                .executes(new PriceCommand(client))));
+                                    .executes(new PriceCommand(mod))
+                                .executes(new PriceCommand(mod))));
         dispatcher.register(literal("стоимость").redirect(command));
     }
 }

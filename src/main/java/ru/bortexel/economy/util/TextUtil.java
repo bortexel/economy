@@ -1,5 +1,9 @@
 package ru.bortexel.economy.util;
 
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.Formatting;
+
 public class TextUtil {
     public static String formatPrice(double price) {
         price = Math.round(price * 100D) / 100D;
@@ -16,5 +20,9 @@ public class TextUtil {
         }
 
         return "" + price;
+    }
+
+    public static void sendCommandError(ServerCommandSource source, String message) {
+        source.sendFeedback(new LiteralText(message).formatted(Formatting.RED), false);
     }
 }

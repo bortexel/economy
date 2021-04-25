@@ -2,16 +2,16 @@ package ru.bortexel.economy.commands;
 
 import com.mojang.brigadier.Command;
 import net.minecraft.server.command.ServerCommandSource;
-import ru.ruscalworld.bortexel4j.Bortexel4J;
+import ru.bortexel.economy.Economy;
 
 public abstract class BortexelCommand implements Command<ServerCommandSource> {
-    private final Bortexel4J client;
+    private final Economy mod;
 
-    protected BortexelCommand(Bortexel4J client) {
-        this.client = client;
+    protected BortexelCommand(Economy mod) {
+        this.mod = mod;
     }
 
-    public Bortexel4J getClient() {
-        return client;
+    public Economy getMod() {
+        return mod;
     }
 }
