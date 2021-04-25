@@ -5,13 +5,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.argument.ColorArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
@@ -26,16 +23,14 @@ import java.util.Locale;
 
 import static net.minecraft.server.command.CommandManager.*;
 
-public class PriceCommand implements Command<ServerCommandSource> {
-    private final Bortexel4J client;
-
+public class PriceCommand extends BortexelCommand {
     public PriceCommand(Bortexel4J client) {
-        this.client = client;
+        super(client);
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) {
-        Item.getByID(StringArgumentType.getString(context, "item"), client).executeAsync(item -> item.getPrices(client).executeAsync(prices -> {
+        Item.getByID(StringArgumentType.getString(context, "item"), this.getClient()).executeAsync(item -> item.getPrices(this.getClient()).executeAsync(prices -> {
             List<Item.ItemPrice> priceList = prices.getPrices();
             if (priceList.size() == 0) throw new CommandException(new LiteralText("Стоимость на данный предмет не установлена"));
             Item.ItemPrice price = priceList.get(priceList.size() - 1);
@@ -69,7 +64,7 @@ public class PriceCommand implements Command<ServerCommandSource> {
         }, error -> {
             throw new CommandException(new LiteralText("Предмет с заданным идентификатором не существует"));
         }));
-        return 0;
+        return Command.SINGLE_SUCCESS;
     }
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, Bortexel4J client) {

@@ -49,6 +49,8 @@ dependencies {
     // You may need to force-disable transitiveness on them.
 
     compile "ru.bortexel:bortexel4j:${project.bortexel4j_version}"
+
+    compileOnly 'net.luckperms:api:5.3'
 }
 
 processResources {
