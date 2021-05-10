@@ -22,9 +22,8 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
 
-import static net.minecraft.server.command.CommandManager.*;
+import static net.minecraft.server.command.CommandManager.literal;
 
 public class PriceCommand extends BortexelCommand {
     public PriceCommand(Economy mod) {

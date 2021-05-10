@@ -6,18 +6,15 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandException;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Vec3d;
 import ru.bortexel.economy.Economy;
 import ru.bortexel.economy.commands.BortexelCommand;
 import ru.bortexel.economy.util.LocationUtil;
 import ru.bortexel.economy.util.TextUtil;
 import ru.ruscalworld.bortexel4j.core.Action;
 import ru.ruscalworld.bortexel4j.models.economy.Report;
-import ru.ruscalworld.bortexel4j.util.Location;
 
 public class CreateReportCommand extends BortexelCommand {
     public CreateReportCommand(Economy mod) {

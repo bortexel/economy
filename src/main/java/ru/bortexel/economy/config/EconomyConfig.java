@@ -1,7 +1,6 @@
 package ru.bortexel.economy.config;
 
 import net.fabricmc.loader.api.FabricLoader;
-import ru.bortexel.economy.Economy;
 
 import java.io.IOException;
 import java.nio.file.Files;
