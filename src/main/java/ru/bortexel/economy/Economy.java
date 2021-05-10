@@ -2,7 +2,10 @@ package ru.bortexel.economy;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 import ru.bortexel.economy.commands.PriceCommand;
 import ru.bortexel.economy.commands.ReportCommand;
 import ru.bortexel.economy.commands.RuslanCommand;
@@ -19,6 +22,7 @@ import java.util.UUID;
 public class Economy implements ModInitializer {
     private Bortexel4J client;
     private EconomyConfig config;
+    private OkHttpClient httpClient;
 
     private final HashMap<UUID, Integer> shopSelectionMap = new HashMap<>();
     private final HashMap<UUID, Integer> playerCache = new HashMap<>();
@@ -27,7 +31,8 @@ public class Economy implements ModInitializer {
     @Override
     public void onInitialize() {
         this.loadConfig();
-        this.setClient(Bortexel4J.login(this.getConfig().getApiToken(), this.getConfig().getApiUrl()));
+        this.setHttpClient(new OkHttpClient());
+        this.setClient(Bortexel4J.login(this.getConfig().getApiToken(), this.getConfig().getApiUrl(), this.getHttpClient()));
         this.updateItemCache();
 
         CommandRegistrationCallback.EVENT.register(((dispatcher, dedicated) -> {
@@ -36,6 +41,17 @@ public class Economy implements ModInitializer {
             ReportCommand.register(dispatcher, this);
             RuslanCommand.register(dispatcher, this);
         }));
+
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            OkHttpClient httpClient = this.getHttpClient();
+            httpClient.dispatcher().executorService().shutdown();
+            httpClient.connectionPool().evictAll();
+
+            try {
+                Cache cache = httpClient.cache();
+                if (cache != null) cache.close();
+            } catch (IOException ignored) { }
+        });
     }
 
     protected void loadConfig() {
@@ -81,5 +97,13 @@ public class Economy implements ModInitializer {
 
     public HashMap<String, Item> getItemCache() {
         return itemCache;
+    }
+
+    public OkHttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(OkHttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 }

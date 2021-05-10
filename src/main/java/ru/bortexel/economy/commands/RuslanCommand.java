@@ -28,7 +28,7 @@ public class RuslanCommand extends BortexelCommand {
             }
 
             context.getSource().sendFeedback(new LiteralText(response.getResponse()), false);
-        });
+        }, this.getMod().getHttpClient());
         return 0;
     }
 

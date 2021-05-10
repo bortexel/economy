@@ -8,13 +8,13 @@ import ru.ruscalworld.bortexel4j.core.Callback;
 import java.io.IOException;
 
 public class Ruslan {
-    public static void getAnswer(String text, Callback<Response> callback) {
-        RequestBody body = RequestBody.create(MediaType.parse("application/json"), new Request(text).getAsJSON());
+    public static void getAnswer(String text, Callback<Response> callback, OkHttpClient client) {
+        RequestBody body = RequestBody.create(new Request(text).getAsJSON(), MediaType.parse("application/json"));
         okhttp3.Request builder = new okhttp3.Request.Builder()
                 .url("https://ruslan.bortexel.ru/getAnswer")
                 .header("Content-Type", "application/json")
                 .post(body).build();
-        new OkHttpClient().newCall(builder).enqueue(new okhttp3.Callback() {
+        client.newCall(builder).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 callback.handle(null);
@@ -32,6 +32,7 @@ public class Ruslan {
                 responseBody.close();
             }
         });
+        new OkHttpClient().dispatcher().executorService().shutdown();
     }
 
     public static class Request {
