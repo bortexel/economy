@@ -3,12 +3,12 @@ package ru.ruscalworld.bortexel.economy;
 import com.google.gson.Gson;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import ru.ruscalworld.bortexel4j.core.Callback;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class Ruslan {
-    public static void getAnswer(String text, Callback<Response> callback) {
+    public static void getAnswer(String text, Consumer<Response> callback) {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), new Request(text).getAsJSON());
         okhttp3.Request builder = new okhttp3.Request.Builder()
                 .url("https://ruslan.bortexel.ru/getAnswer")
@@ -17,18 +17,18 @@ public class Ruslan {
         new OkHttpClient().newCall(builder).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                callback.handle(null);
+                callback.accept(null);
             }
 
             @Override
             public void onResponse(@NotNull Call call, okhttp3.@NotNull Response response) throws IOException {
                 ResponseBody responseBody = response.body();
                 if (responseBody == null) {
-                    callback.handle(null);
+                    callback.accept(null);
                     return;
                 }
 
-                callback.handle(Response.getFromJSON(responseBody.string()));
+                callback.accept(Response.getFromJSON(responseBody.string()));
                 responseBody.close();
             }
         });

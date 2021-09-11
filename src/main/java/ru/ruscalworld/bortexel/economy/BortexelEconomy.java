@@ -12,12 +12,12 @@ import ru.ruscalworld.bortexel.economy.commands.EconomyTabCompleter;
 import ru.ruscalworld.bortexel.economy.commands.PriceCommand;
 import ru.ruscalworld.bortexel.economy.commands.RuslanCommand;
 import ru.ruscalworld.bortexel4j.Bortexel4J;
-import ru.ruscalworld.bortexel4j.core.Callback;
 import ru.ruscalworld.bortexel4j.models.economy.Item;
 import ru.ruscalworld.bortexel4j.models.user.User;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class BortexelEconomy extends JavaPlugin {
     private Bortexel4J client;
@@ -80,11 +80,11 @@ public class BortexelEconomy extends JavaPlugin {
         });
     }
 
-    public void getPlayerID(Player player, Callback<Integer> callback) {
-        if (playerCache.containsKey(player.getName())) callback.handle(playerCache.get(player.getName()));
+    public void getPlayerID(Player player, Consumer<Integer> callback) {
+        if (playerCache.containsKey(player.getName())) callback.accept(playerCache.get(player.getName()));
         else User.getByUsername(player.getName(), this.getClient()).executeAsync(user -> {
             this.playerCache.put(player.getName(), user.getID());
-            callback.handle(user.getID());
+            callback.accept(user.getID());
         });
     }
 
