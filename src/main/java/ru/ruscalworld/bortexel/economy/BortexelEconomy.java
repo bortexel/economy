@@ -7,6 +7,7 @@ import me.lucko.commodore.file.CommodoreFileFormat;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.bortexel.hooks.Bortexel;
 import ru.ruscalworld.bortexel.economy.commands.EconomyCommand;
 import ru.ruscalworld.bortexel.economy.commands.EconomyTabCompleter;
 import ru.ruscalworld.bortexel.economy.commands.PriceCommand;
@@ -20,7 +21,6 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class BortexelEconomy extends JavaPlugin {
-    private Bortexel4J client;
     private final List<Item> itemCache = new ArrayList<>();
     private final List<String> itemSuggestions = new ArrayList<>();
     public HashMap<String, Integer> shops = new HashMap<>();
@@ -63,13 +63,6 @@ public class BortexelEconomy extends JavaPlugin {
             }
         }
 
-        try {
-            client = Bortexel4J.login(getConfig().getString("apiToken"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.setEnabled(false);
-        }
-
         this.updateItemCache();
     }
 
@@ -93,6 +86,6 @@ public class BortexelEconomy extends JavaPlugin {
     }
 
     public Bortexel4J getClient() {
-        return this.client;
+        return Bortexel.getApiClient();
     }
 }
