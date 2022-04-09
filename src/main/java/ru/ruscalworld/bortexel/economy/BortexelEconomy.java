@@ -76,8 +76,9 @@ public class BortexelEconomy extends JavaPlugin {
     public void getPlayerID(Player player, Consumer<Integer> callback) {
         if (playerCache.containsKey(player.getName())) callback.accept(playerCache.get(player.getName()));
         else User.getByUsername(player.getName(), this.getClient()).executeAsync(user -> {
-            this.playerCache.put(player.getName(), user.getID());
-            callback.accept(user.getID());
+            int id = user.getAccountID();
+            this.playerCache.put(player.getName(), id);
+            callback.accept(id);
         });
     }
 
