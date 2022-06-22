@@ -3,7 +3,7 @@ package ru.ruscalworld.bortexel.economy;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
-import me.lucko.commodore.file.CommodoreFileFormat;
+import me.lucko.commodore.file.CommodoreFileReader;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,9 +50,9 @@ public class BortexelEconomy extends JavaPlugin {
 
             try {
                 // Get command nodes from files
-                LiteralCommandNode<Object> economyCommandNode = CommodoreFileFormat.parse(
+                LiteralCommandNode<Object> economyCommandNode = CommodoreFileReader.INSTANCE.parse(
                         Objects.requireNonNull(getResource("commands/economy.commodore")));
-                LiteralCommandNode<Object> priceCommandNode = CommodoreFileFormat.parse(
+                LiteralCommandNode<Object> priceCommandNode = CommodoreFileReader.INSTANCE.parse(
                         Objects.requireNonNull(getResource("commands/price.commodore")));
 
                 // Register command suggestions
